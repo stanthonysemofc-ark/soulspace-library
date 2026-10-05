@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard'
 import History from './pages/History'
 import Overdue from './pages/Overdue'
 import Admin from './pages/Admin'
+import About from './pages/About'
 import Login from './pages/Login'
 
 export default function App() {
@@ -28,6 +29,7 @@ export default function App() {
                 <Route path="/book/:id" element={<BookDetail />} />
                 <Route path="/history" element={<History />} />
                 <Route path="/overdue" element={<Overdue />} />
+                <Route path="/about" element={<About />} />
                 <Route path="/admin" element={<Admin />} />
               </Routes>
               <BottomNav />

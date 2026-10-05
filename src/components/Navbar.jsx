@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { BookOpen, LayoutDashboard, AlertTriangle, Settings, History } from 'lucide-react'
+import { BookOpen, LayoutDashboard, Settings, History, Users } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
 export default function Navbar() {
@@ -9,6 +9,7 @@ export default function Navbar() {
   const navLinks = [
     { to: '/catalog', icon: <BookOpen size={14} />, label: 'Catalog' },
     { to: '/history', icon: <History size={14} />, label: 'History' },
+    { to: '/about', icon: <Users size={14} />, label: 'About Us' },
     ...(user
       ? [{ to: '/admin', icon: <Settings size={14} />, label: 'Admin' }]
       : [{ to: '/login', icon: null, label: 'Sign In' }]
@@ -50,11 +51,11 @@ export function BottomNav() {
   const { user } = useAuth()
 
   const items = [
-    { to: '/', icon: <LayoutDashboard />, label: 'Dashboard' },
-    { to: '/catalog', icon: <BookOpen />, label: 'Catalog' },
-    { to: '/history', icon: <History />, label: 'History' },
-    { to: '/overdue', icon: <AlertTriangle />, label: 'Overdue' },
-    ...(user ? [{ to: '/admin', icon: <Settings />, label: 'Admin' }] : []),
+    { to: '/', icon: <LayoutDashboard size={20} />, label: 'Dashboard' },
+    { to: '/catalog', icon: <BookOpen size={20} />, label: 'Catalog' },
+    { to: '/history', icon: <History size={20} />, label: 'History' },
+    { to: '/about', icon: <Users size={20} />, label: 'About' },
+    ...(user ? [{ to: '/admin', icon: <Settings size={20} />, label: 'Admin' }] : []),
   ]
 
   return (
