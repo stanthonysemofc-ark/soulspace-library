@@ -4,29 +4,42 @@ import { useAuth } from '../context/AuthContext'
 
 export default function Navbar() {
   const { user } = useAuth()
+  const location = useLocation()
+
+  const navLinks = [
+    { to: '/catalog', icon: <BookOpen size={14} />, label: 'Catalog' },
+    { to: '/history', icon: <History size={14} />, label: 'History' },
+    ...(user
+      ? [{ to: '/admin', icon: <Settings size={14} />, label: 'Admin' }]
+      : [{ to: '/login', icon: null, label: 'Sign In' }]
+    ),
+  ]
+
   return (
     <nav className="navbar">
-      <Link to="/" className="navbar-brand">
-        <span className="navbar-logo">✨</span>
-        <div>
-          <span className="navbar-title">SoulSpace</span>
-          <span className="navbar-subtitle">St. Anthony's Church, Kadalana</span>
-        </div>
-      </Link>
-      <div className="navbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        <Link to="/catalog" className="navbar-btn" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-          <BookOpen size={15} /> Catalog
+      {/* Row 1: Brand */}
+      <div className="navbar-row-brand">
+        <Link to="/" className="navbar-brand">
+          <span className="navbar-logo">✨</span>
+          <div>
+            <span className="navbar-title">SoulSpace</span>
+            <span className="navbar-subtitle">St. Anthony's Church, Kadalana</span>
+          </div>
         </Link>
-        <Link to="/history" className="navbar-btn" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-          <History size={15} /> History
-        </Link>
-        {user ? (
-          <Link to="/admin" className="navbar-btn">
-            <Settings size={15} /> Admin
+      </div>
+
+      {/* Row 2: Nav links (below brand on mobile) */}
+      <div className="navbar-row-links">
+        {navLinks.map(link => (
+          <Link
+            key={link.to}
+            to={link.to}
+            className={`navbar-btn${location.pathname === link.to ? ' navbar-btn-active' : ''}`}
+          >
+            {link.icon}
+            {link.label}
           </Link>
-        ) : (
-          <Link to="/login" className="navbar-btn">Sign In</Link>
-        )}
+        ))}
       </div>
     </nav>
   )
