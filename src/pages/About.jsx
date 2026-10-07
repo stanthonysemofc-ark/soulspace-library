@@ -175,7 +175,7 @@ export default function About() {
             </div>
             <div className="contact-info-content">
               <span className="contact-info-label">Sunday School Hours</span>
-              <span className="contact-info-value">Every Sunday: 8:00 AM – 10:30 AM</span>
+              <span className="contact-info-value">Every Sunday: 9:00 AM – 11:00 AM</span>
             </div>
           </div>
 
