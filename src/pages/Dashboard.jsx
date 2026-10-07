@@ -5,6 +5,8 @@ import { useCheckouts } from '../hooks/useCheckouts'
 import { useBooks } from '../hooks/useBooks'
 import { useAuth } from '../context/AuthContext'
 
+import DailyReadings from '../components/DailyReadings'
+
 export default function Dashboard() {
   const [stats, setStats] = useState({ total: 0, out: 0, overdue: 0 })
   const [active, setActive] = useState([])
@@ -78,6 +80,9 @@ export default function Dashboard() {
         {/* Decorative background glow */}
         <div style={{ position: 'absolute', right: '-40px', bottom: '-40px', width: '220px', height: '220px', borderRadius: '50%', background: 'rgba(245, 158, 11, 0.15)', filter: 'blur(40px)', pointerEvents: 'none' }} />
       </div>
+
+      {/* Auto-updating Daily Gospel & Readings of the Day */}
+      <DailyReadings />
 
       {/* Stats Counter Grid */}
       <div className="stats-grid" style={{ marginBottom: '2rem' }}>

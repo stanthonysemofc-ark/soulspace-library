@@ -1089,3 +1089,229 @@ input, textarea, select { font-family: inherit; font-size: 0.95rem; }
   line-height: 1.55;
 }
 
+/* ── Daily Gospel & Readings Card ── */
+.daily-readings-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  padding: 1.35rem 1.5rem;
+  margin-bottom: 1.75rem;
+  position: relative;
+  overflow: hidden;
+}
+.daily-readings-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #7c3aed 0%, #4f46e5 40%, #f59e0b 100%);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+}
+.daily-readings-card.loading {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+}
+
+.daily-readings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+.daily-readings-badge-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.daily-readings-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: linear-gradient(135deg, #ede9fe 0%, #e0e7ff 100%);
+  color: #4f46e5;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.3rem 0.75rem;
+  border-radius: 20px;
+  border: 1px solid #c4b5fd;
+  letter-spacing: 0.02em;
+}
+.daily-season-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #92400e;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  padding: 0.25rem 0.65rem;
+  border-radius: 20px;
+}
+.daily-date-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+.daily-date-row svg {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.daily-tabs-row {
+  display: flex;
+  gap: 0.4rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+}
+.daily-tabs-row::-webkit-scrollbar { display: none; }
+.daily-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface-2);
+  color: var(--color-text-secondary);
+  transition: all var(--transition);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.daily-tab:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+.daily-tab.active {
+  background: var(--color-primary-gradient);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.daily-content-area {
+  min-height: 100px;
+}
+
+/* Gospel Box */
+.gospel-box {
+  background: linear-gradient(135deg, #fdfaff 0%, #f5f3ff 100%);
+  border: 1px solid #ede9fe;
+  border-left: 4px solid var(--color-primary);
+  border-radius: var(--radius-lg);
+  padding: 1.15rem 1.25rem;
+}
+.gospel-box-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+.quote-icon {
+  color: var(--color-primary);
+  opacity: 0.6;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+.gospel-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--color-text);
+  line-height: 1.2;
+  margin-bottom: 0.15rem;
+}
+.gospel-citation {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  letter-spacing: 0.02em;
+}
+.gospel-text {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  font-style: italic;
+}
+.gospel-text.collapsed {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.gospel-text.expanded {
+  display: block;
+}
+.expand-btn {
+  margin-top: 0.65rem;
+  color: var(--color-primary);
+  font-size: 0.8rem;
+  padding: 0.35rem 0.5rem;
+}
+
+/* First Reading Box */
+.reading-box {
+  background: var(--color-surface-2);
+  border-radius: var(--radius-lg);
+  padding: 1.1rem 1.25rem;
+  border: 1px solid var(--color-border);
+  border-left: 4px solid #10b981;
+}
+.reading-citation {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #059669;
+  margin-bottom: 0.6rem;
+  letter-spacing: 0.02em;
+}
+.reading-text {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  font-style: italic;
+}
+
+/* Psalm Box */
+.psalm-box {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef9f0 100%);
+  border: 1px solid #fde68a;
+  border-left: 4px solid #f59e0b;
+  border-radius: var(--radius-lg);
+  padding: 1.1rem 1.25rem;
+}
+.psalm-citation {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #92400e;
+  margin-bottom: 0.6rem;
+  letter-spacing: 0.02em;
+}
+.psalm-response-badge {
+  background: #f59e0b;
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.75rem;
+  display: inline-block;
+  line-height: 1.4;
+}
+.psalm-text {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  font-style: italic;
+}
+
+
