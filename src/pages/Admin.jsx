@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { Pencil, Trash2, Plus, BookOpen, Users, Church, GraduationCap } from 'lucide-react'
 import { useBooks } from '../hooks/useBooks'
 import { useAbout } from '../hooks/useAbout'
@@ -10,10 +10,14 @@ import MemberForm from '../components/MemberForm'
 export default function Admin() {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+
+  // Determine initial view based on route URL
+  const isAddRoute = location.pathname.includes('/add')
 
   // State
   const [activeTab, setActiveTab] = useState('books') // 'books' | 'about'
-  const [view, setView] = useState('list') // 'list' | 'add' | 'edit'
+  const [view, setView] = useState(isAddRoute ? 'add' : 'list') // 'list' | 'add' | 'edit'
 
   // Books
   const { books, loading: booksLoading, fetchBooks, addBook, updateBook, deleteBook } = useBooks()
@@ -31,6 +35,13 @@ export default function Admin() {
     if (!user) navigate('/login')
   }, [user])
 
+  useEffect(() => {
+    if (location.pathname.includes('/add')) {
+      setActiveTab('books')
+      setView('add')
+    }
+  }, [location.pathname])
+
   function showToast(msg, type = 'success') {
     setToast({ msg, type })
     setTimeout(() => setToast(null), 3000)
@@ -42,7 +53,7 @@ export default function Admin() {
     const { error } = await addBook(data)
     setSaving(false)
     if (error) showToast('Failed to add book: ' + error, 'error')
-    else { showToast('Book added!'); setView('list'); fetchBooks() }
+    else { showToast('Book added!'); setView('list'); navigate('/admin'); fetchBooks() }
   }
 
   async function handleEditBook(data) {
@@ -50,7 +61,7 @@ export default function Admin() {
     const { error } = await updateBook(editBook.id, data)
     setSaving(false)
     if (error) showToast('Failed to save: ' + error, 'error')
-    else { showToast('Book updated!'); setView('list'); setEditBook(null); fetchBooks() }
+    else { showToast('Book updated!'); setView('list'); setEditBook(null); navigate('/admin'); fetchBooks() }
   }
 
   async function handleDeleteBook(book) {
@@ -66,7 +77,7 @@ export default function Admin() {
     const { error } = await addMember(data)
     setSaving(false)
     if (error) showToast('Failed to add member: ' + error, 'error')
-    else { showToast('Member added!'); setView('list'); fetchMembers() }
+    else { showToast('Member added!'); setView('list'); navigate('/admin'); fetchMembers() }
   }
 
   async function handleEditMember(data) {
@@ -74,7 +85,7 @@ export default function Admin() {
     const { error } = await updateMember(editMember.id, data)
     setSaving(false)
     if (error) showToast('Failed to update: ' + error, 'error')
-    else { showToast('Member updated!'); setView('list'); setEditMember(null); fetchMembers() }
+    else { showToast('Member updated!'); setView('list'); setEditMember(null); navigate('/admin'); fetchMembers() }
   }
 
   async function handleDeleteMember(member) {
@@ -114,13 +125,13 @@ export default function Admin() {
       <div className="admin-nav-tabs" style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem' }}>
         <button
           className={`btn ${activeTab === 'books' ? 'btn-primary' : 'btn-ghost'} btn-sm`}
-          onClick={() => { setActiveTab('books'); setView('list'); setSearch('') }}
+          onClick={() => { setActiveTab('books'); setView('list'); setSearch(''); navigate('/admin') }}
         >
           <BookOpen size={16} /> Library Catalog ({books.length})
         </button>
         <button
           className={`btn ${activeTab === 'about' ? 'btn-primary' : 'btn-ghost'} btn-sm`}
-          onClick={() => { setActiveTab('about'); setView('list'); setSearch('') }}
+          onClick={() => { setActiveTab('about'); setView('list'); setSearch(''); navigate('/admin') }}
         >
           <Users size={16} /> About Us Members ({members.length})
         </button>
@@ -185,20 +196,20 @@ export default function Admin() {
           {view === 'add' && (
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
-                <button className="btn btn-ghost btn-sm" onClick={() => setView('list')}>← Back</button>
+                <button className="btn btn-ghost btn-sm" onClick={() => { setView('list'); navigate('/admin') }}>← Back</button>
                 <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem' }}>Add New Book</h2>
               </div>
-              <BookForm onSubmit={handleAddBook} onCancel={() => setView('list')} loading={saving} />
+              <BookForm onSubmit={handleAddBook} onCancel={() => { setView('list'); navigate('/admin') }} loading={saving} />
             </>
           )}
 
           {view === 'edit' && editBook && (
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
-                <button className="btn btn-ghost btn-sm" onClick={() => { setView('list'); setEditBook(null) }}>← Back</button>
+                <button className="btn btn-ghost btn-sm" onClick={() => { setView('list'); setEditBook(null); navigate('/admin') }}>← Back</button>
                 <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem' }}>Edit Book</h2>
               </div>
-              <BookForm initial={editBook} onSubmit={handleEditBook} onCancel={() => { setView('list'); setEditBook(null) }} loading={saving} />
+              <BookForm initial={editBook} onSubmit={handleEditBook} onCancel={() => { setView('list'); setEditBook(null); navigate('/admin') }} loading={saving} />
             </>
           )}
         </>
@@ -228,7 +239,7 @@ export default function Admin() {
                 <div className="admin-book-list">
                   {filteredMembers.map(member => (
                     <div key={member.id} className="admin-book-item">
-                      <div className="admin-book-thumb" style={{ borderRadius: '50%', background: 'var(--accent-glow)' }}>
+                      <div className="admin-book-thumb" style={{ borderRadius: '50%', background: 'var(--color-primary-light)' }}>
                         {member.photo_url ? (
                           <img src={member.photo_url} alt={member.name} style={{ borderRadius: '50%' }} />
                         ) : (
@@ -238,7 +249,7 @@ export default function Admin() {
                       <div className="admin-book-info">
                         <div className="admin-book-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                           {member.name}
-                          <span className={`member-type-badge badge-${member.type}`} style={{ fontSize: '0.65rem', padding: '0.1rem 0.4rem' }}>
+                          <span className={`member-type-badge badge-${member.type}`} style={{ fontSize: '0.65rem', padding: '0.1rem 0.4rem', position: 'static', transform: 'none' }}>
                             {member.type === 'priest' ? 'Priest' : 'Teacher'}
                           </span>
                         </div>

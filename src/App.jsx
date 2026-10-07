@@ -31,6 +31,8 @@ export default function App() {
                 <Route path="/overdue" element={<Overdue />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/admin" element={<Admin />} />
+                <Route path="/admin/add" element={<Admin />} />
+                <Route path="/admin/*" element={<Admin />} />
               </Routes>
               <BottomNav />
             </>
