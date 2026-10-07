@@ -149,14 +149,20 @@ input, textarea, select { font-family: inherit; font-size: 0.95rem; }
 }
 .navbar-brand:hover { transform: translateY(-1px); }
 
-.navbar-logo {
-  font-size: 1.25rem;
-  background: var(--color-primary-gradient);
+.navbar-logo, .navbar-logo-wrap {
   width: 36px; height: 36px;
   min-width: 36px;
   border-radius: var(--radius-md);
   display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+  background: #ffffff;
+  padding: 2px;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+}
+.navbar-logo-img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  border-radius: calc(var(--radius-md) - 2px);
 }
 
 .navbar-title {
@@ -744,16 +750,22 @@ input, textarea, select { font-family: inherit; font-size: 0.95rem; }
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 .login-logo { text-align: center; margin-bottom: 1.75rem; }
-.login-logo-icon {
-  font-size: 2.5rem;
+.login-logo-icon, .login-logo-wrap {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 64px; height: 64px;
-  background: var(--color-primary-gradient);
+  width: 72px; height: 72px;
+  background: #ffffff;
   border-radius: var(--radius-lg);
   margin-bottom: 0.75rem;
-  box-shadow: var(--shadow-glow);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  padding: 4px;
+  overflow: hidden;
+}
+.login-logo-img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  border-radius: calc(var(--radius-lg) - 4px);
 }
 .login-logo-title {
   font-family: var(--font-display);

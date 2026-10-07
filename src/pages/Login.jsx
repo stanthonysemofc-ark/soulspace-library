@@ -24,7 +24,9 @@ export default function Login() {
     <div className="login-page">
       <div className="login-card">
         <div className="login-logo">
-          <span className="login-logo-icon">✨</span>
+          <div className="login-logo-wrap">
+            <img src="/logo.png" alt="SoulSpace Logo" className="login-logo-img" />
+          </div>
           <div className="login-logo-title">SoulSpace</div>
           <div className="login-logo-sub">Sunday School Library — Admin Access</div>
         </div>

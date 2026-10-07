@@ -47,13 +47,17 @@ export default function Dashboard() {
             <Church size={14} /> St. Anthony's Church, Kadalana
           </div>
           
-          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '2.2rem', fontWeight: 800, lineHeight: 1.15, marginBottom: '0.5rem', letterSpacing: '-0.02em' }}>
-            SoulSpace Library
-          </h1>
-
-          <p style={{ color: '#e0e7ff', fontSize: '1rem', fontWeight: 500, maxWidth: '560px', lineHeight: 1.5, marginBottom: '1.5rem' }}>
-            English Medium Section — Sunday School Resource & Book Management System
-          </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
+            <img src="/logo.png" alt="SoulSpace Logo" style={{ width: '64px', height: '64px', borderRadius: '16px', background: '#ffffff', padding: '4px', boxShadow: '0 8px 24px rgba(0,0,0,0.25)', objectFit: 'contain' }} />
+            <div>
+              <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '2.2rem', fontWeight: 800, lineHeight: 1.1, letterSpacing: '-0.02em', margin: 0 }}>
+                SoulSpace Library
+              </h1>
+              <p style={{ color: '#e0e7ff', fontSize: '0.95rem', fontWeight: 500, margin: '0.2rem 0 0 0' }}>
+                English Medium Section — Sunday School Resource & Book Management System
+              </p>
+            </div>
+          </div>
 
           {/* Quick Actions */}
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>

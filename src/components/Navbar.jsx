@@ -21,7 +21,9 @@ export default function Navbar() {
       {/* Row 1: Brand */}
       <div className="navbar-row-brand">
         <Link to="/" className="navbar-brand">
-          <span className="navbar-logo">✨</span>
+          <div className="navbar-logo-wrap">
+            <img src="/logo.png" alt="SoulSpace Logo" className="navbar-logo-img" />
+          </div>
           <div>
             <span className="navbar-title">SoulSpace</span>
             <span className="navbar-subtitle">St. Anthony's Church, Kadalana</span>
