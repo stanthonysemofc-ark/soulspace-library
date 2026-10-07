@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useAbout } from '../hooks/useAbout'
-import { GraduationCap, Church, Users, HeartHandshake } from 'lucide-react'
+import { GraduationCap, Church, Users, HeartHandshake, Mail, MapPin, Clock, Phone, Send, ExternalLink } from 'lucide-react'
 
 export default function About() {
   const { members, loading, error } = useAbout()
@@ -131,6 +131,82 @@ export default function About() {
           ))}
         </div>
       )}
+
+      {/* ── Contact Us Card ── */}
+      <div className="contact-card">
+        <div className="contact-card-header">
+          <div className="contact-icon-badge">
+            <Mail size={24} />
+          </div>
+          <div>
+            <h2 className="contact-card-title">Contact & Visit Us</h2>
+            <p className="contact-card-subtitle">
+              We welcome all parishioners, Sunday school students, parents, and visitors to St. Anthony's Church, Kadalana. Feel free to reach out to us!
+            </p>
+          </div>
+        </div>
+
+        <div className="contact-info-grid">
+          <div className="contact-info-item">
+            <div className="contact-info-icon-wrap email">
+              <Mail size={20} />
+            </div>
+            <div className="contact-info-content">
+              <span className="contact-info-label">Email Address</span>
+              <a href="mailto:stanthonys.em.ofc@gmail.com" className="contact-info-value contact-link">
+                stanthonys.em.ofc@gmail.com
+              </a>
+            </div>
+          </div>
+
+          <div className="contact-info-item">
+            <div className="contact-info-icon-wrap location">
+              <MapPin size={20} />
+            </div>
+            <div className="contact-info-content">
+              <span className="contact-info-label">Location</span>
+              <span className="contact-info-value">St. Anthony's Church, Kadalana, Moratuwa</span>
+            </div>
+          </div>
+
+          <div className="contact-info-item">
+            <div className="contact-info-icon-wrap hours">
+              <Clock size={20} />
+            </div>
+            <div className="contact-info-content">
+              <span className="contact-info-label">Sunday School Hours</span>
+              <span className="contact-info-value">Every Sunday: 8:00 AM – 10:30 AM</span>
+            </div>
+          </div>
+
+          <div className="contact-info-item">
+            <div className="contact-info-icon-wrap phone">
+              <Phone size={20} />
+            </div>
+            <div className="contact-info-content">
+              <span className="contact-info-label">Parish Community</span>
+              <span className="contact-info-value">St. Anthony's Church, Kadalana</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="contact-actions-row">
+          <a
+            href="mailto:stanthonys.em.ofc@gmail.com"
+            className="btn btn-primary contact-btn"
+          >
+            <Send size={16} /> Send Email
+          </a>
+          <a
+            href="https://maps.google.com/?q=St.+Anthony's+Church,+Kadalana"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-secondary contact-btn"
+          >
+            <MapPin size={16} /> Open in Google Maps <ExternalLink size={14} />
+          </a>
+        </div>
+      </div>
     </div>
   )
 }
