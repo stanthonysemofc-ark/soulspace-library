@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { BookOpen, LayoutDashboard, Settings, History, Users, AlertTriangle } from 'lucide-react'
+import { BookOpen, LayoutDashboard, Settings, History, Users, AlertTriangle, FileText } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
 export default function Navbar() {
@@ -8,6 +8,7 @@ export default function Navbar() {
 
   const navLinks = [
     { to: '/catalog', icon: <BookOpen size={14} />, label: 'Catalog' },
+    { to: '/past-papers', icon: <FileText size={14} />, label: 'Past Papers' },
     { to: '/history', icon: <History size={14} />, label: 'History' },
     { to: '/overdue', icon: <AlertTriangle size={14} />, label: 'Overdue' },
     { to: '/about', icon: <Users size={14} />, label: 'About Us' },
@@ -56,7 +57,7 @@ export function BottomNav() {
   const items = [
     { to: '/', icon: <LayoutDashboard size={20} />, label: 'Dashboard' },
     { to: '/catalog', icon: <BookOpen size={20} />, label: 'Catalog' },
-    { to: '/history', icon: <History size={20} />, label: 'History' },
+    { to: '/past-papers', icon: <FileText size={20} />, label: 'Papers' },
     { to: '/about', icon: <Users size={20} />, label: 'About' },
     ...(user ? [{ to: '/admin', icon: <Settings size={20} />, label: 'Admin' }] : []),
   ]

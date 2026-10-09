@@ -8,6 +8,7 @@ import History from './pages/History'
 import Overdue from './pages/Overdue'
 import Admin from './pages/Admin'
 import About from './pages/About'
+import PastPapers from './pages/PastPapers'
 import Login from './pages/Login'
 
 export default function App() {
@@ -26,6 +27,7 @@ export default function App() {
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/catalog" element={<Home />} />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/past-papers" element={<PastPapers />} />
                 <Route path="/book/:id" element={<BookDetail />} />
                 <Route path="/history" element={<History />} />
                 <Route path="/overdue" element={<Overdue />} />
