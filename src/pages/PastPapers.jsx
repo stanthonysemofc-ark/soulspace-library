@@ -13,9 +13,10 @@ import {
   X,
   ExternalLink,
   GraduationCap,
-  Sparkles,
   Upload,
-  BookOpen
+  CheckCircle2,
+  BookOpen,
+  Award
 } from 'lucide-react'
 
 export default function PastPapers() {
@@ -26,6 +27,7 @@ export default function PastPapers() {
   const [selectedTerm, setSelectedTerm] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [previewPaper, setPreviewPaper] = useState(null)
+  const [previewType, setPreviewType] = useState('paper') // 'paper' or 'marking'
   
   // Upload modal state
   const [showUploadModal, setShowUploadModal] = useState(false)
@@ -33,17 +35,20 @@ export default function PastPapers() {
   const [formError, setFormError] = useState('')
   const [newPaper, setNewPaper] = useState({
     title: '',
-    grade: 6,
+    grade: 1,
     term: 1,
     year: new Date().getFullYear(),
     subject: 'Christianity',
     file_url: '',
     file_name: '',
-    file_size: ''
+    file_size: '',
+    marking_scheme_url: '',
+    marking_scheme_name: ''
   })
-  const [selectedFile, setSelectedFile] = useState(null)
+  const [selectedPaperFile, setSelectedPaperFile] = useState(null)
+  const [selectedMarkingFile, setSelectedMarkingFile] = useState(null)
 
-  const grades = [6, 7, 8, 9, 10, 11]
+  const grades = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 
   const filteredPapers = papers.filter(paper => {
     const matchesGrade = selectedGrade === 'all' || paper.grade === Number(selectedGrade)
@@ -55,19 +60,23 @@ export default function PastPapers() {
     return matchesGrade && matchesTerm && matchesSearch
   })
 
-  const handleDownload = (paper) => {
-    incrementDownload(paper.id)
-    window.open(paper.file_url, '_blank')
+  const handleDownload = (paper, type = 'paper') => {
+    if (type === 'paper') {
+      incrementDownload(paper.id)
+      window.open(paper.file_url, '_blank')
+    } else if (paper.marking_scheme_url) {
+      window.open(paper.marking_scheme_url, '_blank')
+    }
   }
 
-  const handleFileChange = (e) => {
+  const handlePaperFileChange = (e) => {
     const file = e.target.files[0]
     if (file) {
       if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
-        setFormError('Please select a valid PDF file.')
+        setFormError('Please select a valid PDF file for the Question Paper.')
         return
       }
-      setSelectedFile(file)
+      setSelectedPaperFile(file)
       setFormError('')
       if (!newPaper.title) {
         setNewPaper(prev => ({
@@ -80,6 +89,22 @@ export default function PastPapers() {
     }
   }
 
+  const handleMarkingFileChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
+        setFormError('Please select a valid PDF file for the Marking Scheme.')
+        return
+      }
+      setSelectedMarkingFile(file)
+      setFormError('')
+      setNewPaper(prev => ({
+        ...prev,
+        marking_scheme_name: file.name
+      }))
+    }
+  }
+
   const handleUploadSubmit = async (e) => {
     e.preventDefault()
     setFormError('')
@@ -87,19 +112,19 @@ export default function PastPapers() {
 
     try {
       let finalFileUrl = newPaper.file_url
+      let finalMarkingUrl = newPaper.marking_scheme_url
 
-      if (selectedFile) {
-        const fileExt = selectedFile.name.split('.').pop()
-        const fileName = `gr${newPaper.grade}_term${newPaper.term}_${Date.now()}.${fileExt}`
-        const filePath = `${newPaper.grade}/${fileName}`
+      // Upload paper PDF if file selected
+      if (selectedPaperFile) {
+        const fileExt = selectedPaperFile.name.split('.').pop()
+        const fileName = `gr${newPaper.grade}_term${newPaper.term}_paper_${Date.now()}.${fileExt}`
+        const filePath = `grade_${newPaper.grade}/${fileName}`
 
         const { error: uploadErr } = await supabase.storage
           .from('past-papers')
-          .upload(filePath, selectedFile, { upsert: true })
+          .upload(filePath, selectedPaperFile, { upsert: true })
 
-        if (uploadErr) {
-          throw new Error(`Upload failed: ${uploadErr.message}`)
-        }
+        if (uploadErr) throw new Error(`Paper upload failed: ${uploadErr.message}`)
 
         const { data: publicUrlData } = supabase.storage
           .from('past-papers')
@@ -108,8 +133,27 @@ export default function PastPapers() {
         finalFileUrl = publicUrlData.publicUrl
       }
 
+      // Upload marking scheme PDF if file selected
+      if (selectedMarkingFile) {
+        const fileExt = selectedMarkingFile.name.split('.').pop()
+        const fileName = `gr${newPaper.grade}_term${newPaper.term}_marking_${Date.now()}.${fileExt}`
+        const filePath = `grade_${newPaper.grade}/${fileName}`
+
+        const { error: markUploadErr } = await supabase.storage
+          .from('past-papers')
+          .upload(filePath, selectedMarkingFile, { upsert: true })
+
+        if (markUploadErr) throw new Error(`Marking scheme upload failed: ${markUploadErr.message}`)
+
+        const { data: markingPublicUrlData } = supabase.storage
+          .from('past-papers')
+          .getPublicUrl(filePath)
+
+        finalMarkingUrl = markingPublicUrlData.publicUrl
+      }
+
       if (!finalFileUrl) {
-        throw new Error('Please select a PDF file to upload or provide a file URL.')
+        throw new Error('Please select a Question Paper PDF file to upload or provide a file URL.')
       }
 
       const res = await addPaper({
@@ -118,23 +162,28 @@ export default function PastPapers() {
         term: Number(newPaper.term),
         year: Number(newPaper.year),
         file_url: finalFileUrl,
-        file_name: newPaper.file_name || selectedFile?.name || 'past_paper.pdf',
-        file_size: newPaper.file_size || '1.0 MB'
+        file_name: newPaper.file_name || selectedPaperFile?.name || 'past_paper.pdf',
+        file_size: newPaper.file_size || '1.0 MB',
+        marking_scheme_url: finalMarkingUrl || null,
+        marking_scheme_name: finalMarkingUrl ? (newPaper.marking_scheme_name || selectedMarkingFile?.name || 'marking_scheme.pdf') : null
       })
 
       if (!res.success) throw new Error(res.error)
 
       setShowUploadModal(false)
-      setSelectedFile(null)
+      setSelectedPaperFile(null)
+      setSelectedMarkingFile(null)
       setNewPaper({
         title: '',
-        grade: 6,
+        grade: 1,
         term: 1,
         year: new Date().getFullYear(),
         subject: 'Christianity',
         file_url: '',
         file_name: '',
-        file_size: ''
+        file_size: '',
+        marking_scheme_url: '',
+        marking_scheme_name: ''
       })
     } catch (err) {
       setFormError(err.message)
@@ -149,11 +198,11 @@ export default function PastPapers() {
       <div className="papers-hero">
         <div className="papers-hero-badge">
           <GraduationCap size={16} />
-          <span>Sunday School Exam Repository</span>
+          <span>Sunday School Exam & Marking Scheme Repository</span>
         </div>
-        <h1 className="papers-hero-title">Past Examination Papers</h1>
+        <h1 className="papers-hero-title">Past Papers & Marking Schemes</h1>
         <p className="papers-hero-subtitle">
-          Access past examination papers for Grades 6 through 11 for St. Anthony's Church Sunday School. Download or preview papers online for term evaluation and final exam prep.
+          Access past examination papers and official marking schemes for Grades 1 through 11 for St. Anthony's Church Sunday School. Preview online or download for revision and study.
         </p>
 
         {/* Search & Action bar */}
@@ -162,7 +211,7 @@ export default function PastPapers() {
             <Search size={18} className="search-icon" />
             <input
               type="text"
-              placeholder="Search by title, year (e.g. 2024)..."
+              placeholder="Search by title, grade, year (e.g. 2024)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="papers-search-input"
@@ -178,15 +227,15 @@ export default function PastPapers() {
             className="btn btn-primary add-paper-btn"
             onClick={() => setShowUploadModal(true)}
           >
-            <Plus size={16} /> Upload Paper
+            <Plus size={16} /> Upload Paper / Scheme
           </button>
         </div>
       </div>
 
-      {/* Grade Selector Tabs */}
+      {/* Grade Selector Tabs (Grades 1 to 11) */}
       <div className="grade-selector-container">
         <div className="grade-label-row">
-          <Filter size={15} /> Select Grade:
+          <Filter size={15} /> Select Grade (Grades 1 – 11):
         </div>
         <div className="grade-tabs">
           <button
@@ -284,37 +333,76 @@ export default function PastPapers() {
                       </>
                     )}
                   </div>
+
+                  {/* Marking Scheme Badge Indicator */}
+                  {paper.marking_scheme_url ? (
+                    <div className="marking-scheme-badge available">
+                      <Award size={13} /> Marking Scheme Available
+                    </div>
+                  ) : (
+                    <div className="marking-scheme-badge unavailable">
+                      <Award size={13} /> Paper Only
+                    </div>
+                  )}
                 </div>
               </div>
 
-              <div className="paper-card-footer">
-                <button
-                  className="paper-action-btn btn-view"
-                  onClick={() => setPreviewPaper(paper)}
-                  title="Preview PDF"
-                >
-                  <Eye size={15} /> Preview
-                </button>
-                <button
-                  className="paper-action-btn btn-download"
-                  onClick={() => handleDownload(paper)}
-                  title="Download PDF"
-                >
-                  <Download size={15} /> Download
-                </button>
+              <div className="paper-card-footer-stacked">
+                <div className="paper-action-group">
+                  <button
+                    className="paper-action-btn btn-view"
+                    onClick={() => {
+                      setPreviewPaper(paper)
+                      setPreviewType('paper')
+                    }}
+                    title="Preview Question Paper"
+                  >
+                    <Eye size={14} /> Paper
+                  </button>
+                  <button
+                    className="paper-action-btn btn-download"
+                    onClick={() => handleDownload(paper, 'paper')}
+                    title="Download Question Paper"
+                  >
+                    <Download size={14} /> Paper PDF
+                  </button>
+                </div>
+
+                {paper.marking_scheme_url && (
+                  <div className="paper-action-group marking-group">
+                    <button
+                      className="paper-action-btn btn-marking-view"
+                      onClick={() => {
+                        setPreviewPaper(paper)
+                        setPreviewType('marking')
+                      }}
+                      title="Preview Marking Scheme"
+                    >
+                      <Award size={14} /> View Scheme
+                    </button>
+                    <button
+                      className="paper-action-btn btn-marking-download"
+                      onClick={() => handleDownload(paper, 'marking')}
+                      title="Download Marking Scheme"
+                    >
+                      <Download size={14} /> Scheme PDF
+                    </button>
+                  </div>
+                )}
 
                 {user && (
-                  <button
-                    className="paper-action-btn btn-delete"
-                    onClick={() => {
-                      if (window.confirm(`Delete "${paper.title}"?`)) {
-                        deletePaper(paper.id)
-                      }
-                    }}
-                    title="Delete Paper"
-                  >
-                    <Trash2 size={14} />
-                  </button>
+                  <div className="admin-delete-row">
+                    <button
+                      className="btn-delete-full"
+                      onClick={() => {
+                        if (window.confirm(`Delete "${paper.title}"?`)) {
+                          deletePaper(paper.id)
+                        }
+                      }}
+                    >
+                      <Trash2 size={13} /> Delete Paper Record
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
@@ -328,17 +416,39 @@ export default function PastPapers() {
           <div className="modal-sheet pdf-preview-sheet" onClick={(e) => e.stopPropagation()}>
             <div className="pdf-preview-header">
               <div>
-                <h3 className="modal-title" style={{ marginBottom: '0.2rem' }}>{previewPaper.title}</h3>
-                <span className="pdf-preview-meta">Grade {previewPaper.grade} • Term {previewPaper.term} • {previewPaper.year}</span>
+                <h3 className="modal-title" style={{ marginBottom: '0.25rem' }}>
+                  {previewType === 'marking' ? `Marking Scheme: ${previewPaper.title}` : previewPaper.title}
+                </h3>
+                <span className="pdf-preview-meta">
+                  Grade {previewPaper.grade} • Term {previewPaper.term} • {previewPaper.year} • {previewType === 'marking' ? 'Marking Scheme / Answer Key' : 'Question Paper'}
+                </span>
               </div>
               <button className="modal-close-btn" onClick={() => setPreviewPaper(null)}>
                 <X size={20} />
               </button>
             </div>
 
+            {/* Toggle between Paper & Marking Scheme in preview */}
+            {previewPaper.marking_scheme_url && (
+              <div className="preview-toggle-tabs">
+                <button
+                  className={`preview-toggle-btn ${previewType === 'paper' ? 'active' : ''}`}
+                  onClick={() => setPreviewType('paper')}
+                >
+                  <FileText size={15} /> Question Paper
+                </button>
+                <button
+                  className={`preview-toggle-btn ${previewType === 'marking' ? 'active' : ''}`}
+                  onClick={() => setPreviewType('marking')}
+                >
+                  <Award size={15} /> Marking Scheme / Answer Key
+                </button>
+              </div>
+            )}
+
             <div className="pdf-iframe-wrapper">
               <iframe
-                src={previewPaper.file_url}
+                src={previewType === 'marking' ? previewPaper.marking_scheme_url : previewPaper.file_url}
                 title={previewPaper.title}
                 className="pdf-iframe"
               />
@@ -346,7 +456,7 @@ export default function PastPapers() {
 
             <div className="modal-footer" style={{ marginTop: '1rem' }}>
               <a
-                href={previewPaper.file_url}
+                href={previewType === 'marking' ? previewPaper.marking_scheme_url : previewPaper.file_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-secondary"
@@ -356,23 +466,23 @@ export default function PastPapers() {
               </a>
               <button
                 className="btn btn-primary"
-                onClick={() => handleDownload(previewPaper)}
+                onClick={() => handleDownload(previewPaper, previewType)}
                 style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
               >
-                <Download size={15} /> Download File
+                <Download size={15} /> Download {previewType === 'marking' ? 'Scheme PDF' : 'Paper PDF'}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Upload Paper Modal */}
+      {/* Upload Paper & Marking Scheme Modal */}
       {showUploadModal && (
         <div className="modal-backdrop" onClick={() => setShowUploadModal(false)}>
           <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
             <div className="modal-handle" />
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <h3 className="modal-title" style={{ margin: 0 }}>Upload Past Paper</h3>
+              <h3 className="modal-title" style={{ margin: 0 }}>Upload Past Paper & Marking Scheme</h3>
               <button className="modal-close-btn" onClick={() => setShowUploadModal(false)}><X size={18} /></button>
             </div>
 
@@ -388,7 +498,7 @@ export default function PastPapers() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Grade 10 Christianity 1st Term Paper 2025"
+                  placeholder="e.g. Grade 5 Sunday School 1st Term Evaluation 2025"
                   value={newPaper.title}
                   onChange={(e) => setNewPaper(prev => ({ ...prev, title: e.target.value }))}
                   className="form-input"
@@ -397,7 +507,7 @@ export default function PastPapers() {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
                 <div className="form-group">
-                  <label className="form-label">Grade *</label>
+                  <label className="form-label">Grade (1 – 11) *</label>
                   <select
                     value={newPaper.grade}
                     onChange={(e) => setNewPaper(prev => ({ ...prev, grade: e.target.value }))}
@@ -448,31 +558,72 @@ export default function PastPapers() {
                 </div>
               </div>
 
-              <div className="form-group">
-                <label className="form-label">Upload PDF File</label>
-                <input
-                  type="file"
-                  accept=".pdf,application/pdf"
-                  onChange={handleFileChange}
-                  className="form-input"
-                  style={{ padding: '0.5rem' }}
-                />
-                {selectedFile && (
-                  <div style={{ fontSize: '0.8rem', color: 'var(--color-primary)', marginTop: '0.3rem', fontWeight: 600 }}>
-                    Selected: {selectedFile.name} ({(selectedFile.size / (1024 * 1024)).toFixed(1)} MB)
-                  </div>
-                )}
+              {/* SECTION 1: QUESTION PAPER */}
+              <div style={{ background: 'var(--color-surface-2)', padding: '1rem', borderRadius: '12px', marginBottom: '1rem', border: '1px solid var(--color-border)' }}>
+                <h4 style={{ fontSize: '0.88rem', fontWeight: 800, margin: '0 0 0.75rem 0', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <FileText size={16} /> 1. Question Paper PDF *
+                </h4>
+
+                <div className="form-group" style={{ marginBottom: '0.5rem' }}>
+                  <label className="form-label" style={{ fontSize: '0.78rem' }}>Upload Question Paper PDF File</label>
+                  <input
+                    type="file"
+                    accept=".pdf,application/pdf"
+                    onChange={handlePaperFileChange}
+                    className="form-input"
+                    style={{ padding: '0.4rem' }}
+                  />
+                  {selectedPaperFile && (
+                    <div style={{ fontSize: '0.8rem', color: '#16a34a', marginTop: '0.3rem', fontWeight: 600 }}>
+                      Selected: {selectedPaperFile.name} ({(selectedPaperFile.size / (1024 * 1024)).toFixed(1)} MB)
+                    </div>
+                  )}
+                </div>
+
+                <div className="form-group" style={{ margin: 0 }}>
+                  <label className="form-label" style={{ fontSize: '0.78rem' }}>Or Direct Question Paper URL</label>
+                  <input
+                    type="url"
+                    placeholder="https://..."
+                    value={newPaper.file_url}
+                    onChange={(e) => setNewPaper(prev => ({ ...prev, file_url: e.target.value }))}
+                    className="form-input"
+                  />
+                </div>
               </div>
 
-              <div className="form-group">
-                <label className="form-label">Or Direct File / Drive URL</label>
-                <input
-                  type="url"
-                  placeholder="https://..."
-                  value={newPaper.file_url}
-                  onChange={(e) => setNewPaper(prev => ({ ...prev, file_url: e.target.value }))}
-                  className="form-input"
-                />
+              {/* SECTION 2: MARKING SCHEME */}
+              <div style={{ background: '#f0fdf4', padding: '1rem', borderRadius: '12px', marginBottom: '1rem', border: '1px solid #bbf7d0' }}>
+                <h4 style={{ fontSize: '0.88rem', fontWeight: 800, margin: '0 0 0.75rem 0', color: '#15803d', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <Award size={16} /> 2. Marking Scheme / Answer Key PDF (Optional)
+                </h4>
+
+                <div className="form-group" style={{ marginBottom: '0.5rem' }}>
+                  <label className="form-label" style={{ fontSize: '0.78rem' }}>Upload Marking Scheme PDF File</label>
+                  <input
+                    type="file"
+                    accept=".pdf,application/pdf"
+                    onChange={handleMarkingFileChange}
+                    className="form-input"
+                    style={{ padding: '0.4rem' }}
+                  />
+                  {selectedMarkingFile && (
+                    <div style={{ fontSize: '0.8rem', color: '#16a34a', marginTop: '0.3rem', fontWeight: 600 }}>
+                      Selected: {selectedMarkingFile.name} ({(selectedMarkingFile.size / (1024 * 1024)).toFixed(1)} MB)
+                    </div>
+                  )}
+                </div>
+
+                <div className="form-group" style={{ margin: 0 }}>
+                  <label className="form-label" style={{ fontSize: '0.78rem' }}>Or Direct Marking Scheme URL</label>
+                  <input
+                    type="url"
+                    placeholder="https://..."
+                    value={newPaper.marking_scheme_url}
+                    onChange={(e) => setNewPaper(prev => ({ ...prev, marking_scheme_url: e.target.value }))}
+                    className="form-input"
+                  />
+                </div>
               </div>
 
               <div className="modal-footer">
@@ -489,7 +640,7 @@ export default function PastPapers() {
                   className="btn btn-primary"
                   style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
                 >
-                  {isUploading ? 'Uploading...' : <><Upload size={16} /> Save Paper</>}
+                  {isUploading ? 'Uploading...' : <><Upload size={16} /> Save Paper & Marking Scheme</>}
                 </button>
               </div>
             </form>

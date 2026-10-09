@@ -1845,5 +1845,138 @@ input, textarea, select { font-family: inherit; font-size: 0.95rem; }
   border: none;
 }
 
+/* Marking Scheme Badges */
+.marking-scheme-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 12px;
+  margin-top: 0.4rem;
+}
+.marking-scheme-badge.available {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+.marking-scheme-badge.unavailable {
+  background: var(--color-surface-2);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+}
+
+/* Stacked action footer */
+.paper-card-footer-stacked {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 0.85rem;
+  border-top: 1px dashed var(--color-border);
+}
+.paper-action-group {
+  display: flex;
+  gap: 0.5rem;
+}
+.paper-action-group.marking-group {
+  padding-top: 0.4rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.btn-marking-view {
+  flex: 1;
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: var(--radius-md);
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition: all var(--transition);
+}
+.btn-marking-view:hover {
+  background: #dcfce7;
+}
+
+.btn-marking-download {
+  flex: 1;
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  color: #ffffff;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: var(--radius-md);
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition: all var(--transition);
+}
+.btn-marking-download:hover {
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+  opacity: 0.95;
+}
+
+.admin-delete-row {
+  margin-top: 0.2rem;
+}
+.btn-delete-full {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.35rem;
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-md);
+  font-size: 0.75rem;
+  font-weight: 700;
+  transition: all var(--transition);
+}
+.btn-delete-full:hover {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+/* Modal Toggle Tabs for Question Paper vs Marking Scheme */
+.preview-toggle-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+  background: var(--color-surface-2);
+  padding: 0.35rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+}
+.preview-toggle-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.45rem;
+  border-radius: var(--radius-md);
+  font-size: 0.82rem;
+  font-weight: 700;
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: none;
+  transition: all var(--transition);
+}
+.preview-toggle-btn.active {
+  background: var(--color-surface);
+  color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+
 
 
